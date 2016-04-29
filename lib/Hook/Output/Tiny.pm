@@ -26,16 +26,12 @@ sub hook {
 
     my @handles = $self->_handles($handle);
 
-    print "##### $_\n" for @handles;
-
-    for (@handles){
-        if ($_ eq 'stdout'){
-            $self->_stdout;
-            select $self->{stdout}{handle};
-        }
-        if ($_ eq 'stderr'){
-            $self->_stderr;
-        }
+    if (grep {$_ eq 'stderr'} @handles){
+        $self->_stderr;
+    }
+    if (grep {$_ eq 'stdout'} @handles){
+        $self->_stdout;
+        select $self->{stdout}{handle};
     }
 }
 sub unhook {
@@ -43,16 +39,14 @@ sub unhook {
 
     my @handles = $self->_handles($handle);
 
-    for (@handles){
-        if ($_ eq 'stdout'){
-            select uc $_ or die $!;
-            $self->{stdout}{state} = 0;
-        }
-        if ($_ eq 'stderr'){
-            close STDERR;
-            open STDERR, ">&$self->{stderr}{handle}" or die $!;
-            $self->{stderr}{state} = 0;
-        }
+    if (grep {$_ eq 'stderr'} @handles){
+        close STDERR;
+        open STDERR, ">&$self->{stderr}{handle}" or die $!;
+        $self->{stderr}{state} = 0;
+    }
+    if (grep {$_ eq 'stdout'} @handles){
+        select STDOUT or die $!;
+        $self->{stdout}{state} = 0;
     }
 }
 sub stdout {
