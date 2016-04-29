@@ -4,62 +4,93 @@ use 5.006;
 use strict;
 use warnings;
 
-=head1 NAME
-
-Hook::Output::Tiny - The great new Hook::Output::Tiny!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
 our $VERSION = '0.01';
 
+sub new {
+    return bless {
+        stdout => {
+            state => 0,
+            handle => *fh,
+            data => '',
+        },
+        stderr => {
+            state => 0,
+            handle => *fh,
+            data => '',
+        },
+    }, shift;
+}
+
+sub hook {
+    my ($self, @handles) = @_;
+
+    for (@handles){
+        if ($_ eq 'stdout'){
+            $self->_stdout;
+            select $self->{stdout}{handle};
+        }
+        if ($_ eq 'stderr'){
+            $self->_stderr;
+        }
+    }
+}
+sub unhook {
+    my ($self, $handle) = @_;
+
+    my @handles;
+
+    if ($handle){
+        push @handles, $handle;
+    }
+    else {
+        @handles = qw(stdout stderr);
+    }
+
+    for (@handles){
+        if ($_ eq 'stdout'){
+            select uc $_ or die $!;
+            $self->{stdout}{state} = 0;
+        }
+        if ($_ eq 'stderr'){
+            close STDERR;
+            open STDERR, ">&$self->{stderr}{handle}" or die $!;
+            $self->{stderr}{state} = 0;
+        }
+    }
+}
+sub stdout {
+    my $self = shift;
+    return split /\n/, $self->{stdout}{data};
+}
+sub stderr {
+    my $self = shift;
+    return split /\n/, $self->{stderr}{data};
+}
+sub _stdout {
+    my $self = shift;
+    open $self->{stdout}{handle}, '>>', \$self->{stdout}{data}
+      or die "Cannot duplicate STDOUT: $!";
+    $self->{stdout}{state} = 1;
+}
+sub _stderr {
+    my $self = shift;
+    open $self->{stderr}{handle}, ">&STDERR" or die $!;
+    close STDERR;
+    open STDERR, '>>', \$self->{stderr}{data} or die $!;
+}
+=head1 NAME
+
+Hook::Output::Tiny - Easily enable/disable capturing of STDOUT/STDERR
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use Hook::Output::Tiny;
-
-    my $foo = Hook::Output::Tiny->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 SUBROUTINES/METHODS
-
-=head2 function1
-
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
+=head1 METHODS
 
 =head1 AUTHOR
 
 Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 BUGS
-
-Please report any bugs or feature requests to C<bug-hook-output-tiny at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Hook-Output-Tiny>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
 
 
 =head1 SUPPORT
@@ -68,31 +99,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Hook::Output::Tiny
 
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hook-Output-Tiny>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hook-Output-Tiny>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Hook-Output-Tiny>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Hook-Output-Tiny/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
+=head1 SEE ALSO
 
 
 =head1 LICENSE AND COPYRIGHT
