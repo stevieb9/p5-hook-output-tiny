@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     return bless {
@@ -50,18 +50,14 @@ sub stderr {
 }
 sub flush {
     my ($self, $handle) = @_;
-
     my @handles = $self->_handles($handle);
-
     for (@handles){
         delete $self->{$_}{data};
     }
 }
 sub write {
     my ($self, $fn, $handle) = @_;
-
     my @handles = $self->_handles($handle);
-
     for (@handles){
         open my $wfh, '>>', $fn or die $!;
         print $wfh $self->{$_}{data};
@@ -77,7 +73,8 @@ sub _stdout {
 }
 sub _stderr {
     my $self = shift;
-    open $self->{stderr}{handle}, ">&STDERR" or die $!;
+    open $self->{stderr}{handle}, ">&STDERR"
+      or die "can't hook STDERR: $!";
     close STDERR;
     open STDERR, '>>', \$self->{stderr}{data} or die $!;
 }
@@ -90,9 +87,7 @@ sub _struct {
 }
 sub _handles {
     my ($self, $handle) = @_;
-
     my @handles;
-
     if ($handle){
         push @handles, $handle;
     }
@@ -103,7 +98,7 @@ sub _handles {
 }
 =head1 NAME
 
-Hook::Output::Tiny - Easily enable/disable capturing of STDOUT/STDERR
+Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 
 =head1 SYNOPSIS
 
@@ -111,7 +106,7 @@ use Hook::Output::Tiny;
 
 my $h = Hook::Output::Tiny->new;
 
-# capture either STDOUT or STDERR
+# trap either
 
 $h->hook('stdout');
 my @out = $h->stdout;
@@ -119,12 +114,12 @@ my @out = $h->stdout;
 $h->hook('stderr');
 my @err = $h->stderr;
 
-# un-capture either
+# untrap either
 
 $h->unhook('stdout');
 $h->unhook('stderr');
 
-# capture and un-capture both simultaneously
+# trap/untrap both simultaneously
 
 $h->hook;
 $h->unhook;
@@ -139,14 +134,13 @@ $h->write('file.txt');
 
 =head1 DESCRIPTION
 
-Extremely lightweight mechanism for capturing C<STDOUT>, C<STDERR> or both.
+Extremely lightweight mechanism for trapping C<STDOUT>, C<STDERR> or both.
 
-We save the captured output internally for the entire process run, so on long
-running applications, memory usage may become an issue if you don't flush out
-or write out the data.
+We save the captured output internally, so on long running applications, memory
+usage may become an issue if you don't flush out or write out the data.
 
 There are many modules that perform this task. I wrote this one for fun, and to
-be as small as possible.
+be as small and as simple as possible.
 
 =head1 METHODS
 
@@ -156,22 +150,22 @@ Returns a new L<Hook::Output::Tiny> instance.
 
 =head2 hook
 
-You can send in either C<'stdout'> or C<'stderr'> and we'll capture that data.
-If you don't specify an option, we'll capture both (internally, we keep the data
-separate for both handles).
+You can send in either C<'stdout'> or C<'stderr'> and we'll trap that data.
+
+If you don't specify an option, we'll trap both (the data remains separated).
 
 =head2 unhook
 
-Send in either C<'stdout'> or C<'stderr'>. If not specified, we'll un-capture
+Send in either C<'stdout'> or C<'stderr'>. If not specified, we'll untrap
 both.
 
 =head2 stdout
 
-Returns a list of all the C<STDOUT> entries that have been caught.
+Returns a list of all the C<STDOUT> entries that have been trapped.
 
 =head2 stderr
 
-Returns a list of all the C<STDERR> entries that have been caught.
+Returns a list of all the C<STDERR> entries that have been trapped.
 
 =head2 write($filename, $handle)
 
@@ -179,27 +173,47 @@ Writes to C<$filename> the entries in C<$handle>, where C<$handle> is either
 C<stdout> or C<stderr>. If no C<$handle> is specified, we'll write out both
 handles to the same file.
 
-We then C<flush()> the respective handle data.
+We then C<flush()> (ie. delete) the respective handle data until the next
+C<write()> or C<flush()>.
 
 =head2 flush
 
 Deletes all data for the handles. Send in either C<'stdout'> or C<'stderr'> to
 specify which to delete, otherwise we'll delete both.
 
+=head1 EXAMPLE
+
+Testing scenario...
+
+    use Foo::Bar;
+    use Hook::Output::Tiny;
+    use Test::More;
+
+    my $output = Hook::Output::Tiny->new;
+
+    $output->hook;
+
+    my $thing = Foo::Bar->new;
+
+    $output->unhook;
+
+    is ($thing->do(), 1, "thing() ok");
+    is ($output->stdout, 1, "got expected STDOUT");
+    is ($output->stderr, 0, "got no STDERR");
+
+    for ($output->stdout){
+        like ($_, 'Foo::Bar object initialized', "STDOUT ok");
+    }
+
 =head1 AUTHOR
 
 Steve Bertrand, C<< <steveb at cpan.org> >>
-
-=head1 BUGS
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Hook::Output::Tiny
-
-=head1 SEE ALSO
-
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -210,8 +224,3 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See L<http://dev.perl.org/licenses/> for more information.
-
-
-=cut
-
-1; # End of Hook::Output::Tiny

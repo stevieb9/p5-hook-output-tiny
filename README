@@ -1,55 +1,127 @@
-Hook-Output-Tiny
+NAME
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+    Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+SYNOPSIS
 
+    use Hook::Output::Tiny;
 
-INSTALLATION
+    my $h = Hook::Output::Tiny->new;
 
-To install this module, run the following commands:
+    # trap either
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    $h->hook('stdout'); my @out = $h->stdout;
 
-SUPPORT AND DOCUMENTATION
+    $h->hook('stderr'); my @err = $h->stderr;
 
-After installing, you can find documentation for this module with the
-perldoc command.
+    # untrap either
 
-    perldoc Hook::Output::Tiny
+    $h->unhook('stdout'); $h->unhook('stderr');
 
-You can also look for information at:
+    # trap/untrap both simultaneously
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hook-Output-Tiny
+    $h->hook; $h->unhook;
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Hook-Output-Tiny
+    # delete all entries from both (can specify individually)
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Hook-Output-Tiny
+    $h->flush;
 
-    Search CPAN
-        http://search.cpan.org/dist/Hook-Output-Tiny/
+    # append to a file (can specify individually)
 
+    $h->write('file.txt');
+
+DESCRIPTION
+
+    Extremely lightweight mechanism for trapping STDOUT, STDERR or both.
+
+    We save the captured output internally for the entire process run, so
+    on long running applications, memory usage may become an issue if you
+    don't flush out or write out the data.
+
+    There are many modules that perform this task. I wrote this one for
+    fun, and to be as small and as simple as possible.
+
+METHODS
+
+ new
+
+    Returns a new Hook::Output::Tiny instance.
+
+ hook
+
+    You can send in either 'stdout' or 'stderr' and we'll trap that data.
+
+    If you don't specify an option, we'll trap both (the data remains
+    separated).
+
+ unhook
+
+    Send in either 'stdout' or 'stderr'. If not specified, we'll untrap
+    both.
+
+ stdout
+
+    Returns a list of all the STDOUT entries that have been trapped.
+
+ stderr
+
+    Returns a list of all the STDERR entries that have been trapped.
+
+ write($filename, $handle)
+
+    Writes to $filename the entries in $handle, where $handle is either
+    stdout or stderr. If no $handle is specified, we'll write out both
+    handles to the same file.
+
+    We then flush() (ie. delete) the respective handle data until the next
+    write() or flush().
+
+ flush
+
+    Deletes all data for the handles. Send in either 'stdout' or 'stderr'
+    to specify which to delete, otherwise we'll delete both.
+
+EXAMPLE
+
+    Testing scenario...
+
+        use Foo::Bar;
+        use Hook::Output::Tiny;
+        use Test::More;
+    
+        my $output = Hook::Output::Tiny->new;
+    
+        $output->hook;
+    
+        my $thing = Foo::Bar->new;
+    
+        $output->unhook;
+    
+        is ($thing->do(), 1, "thing() ok");
+        is ($output->stdout, 1, "got expected STDOUT");
+        is ($output->stderr, 0, "got no STDERR");
+    
+        for ($output->stdout){
+            like ($_, 'Foo::Bar object initialized', "STDOUT ok");
+        }
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Hook::Output::Tiny
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Steve Bertrand
+    Copyright 2016 Steve Bertrand.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
 
-See L<http://dev.perl.org/licenses/> for more information.
+    See http://dev.perl.org/licenses/ for more information.
 
