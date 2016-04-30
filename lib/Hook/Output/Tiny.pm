@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     return bless {
@@ -99,6 +99,10 @@ sub _handles {
 =head1 NAME
 
 Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
+
+=for html
+<a href="http://travis-ci.org/stevieb9/p5-hook-output-tiny"><img src="https://secure.travis-ci.org/stevieb9/p5-hook-output-tiny.png"/>
+<a href='https://coveralls.io/github/stevieb9/p5-hook-output-tiny?branch=master'><img src='https://coveralls.io/repos/stevieb9/p5-hook-output-tiny/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 SYNOPSIS
 

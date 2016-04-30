@@ -1,5 +1,14 @@
 Revision history for Hook-Output-Tiny
 
+0.03    2016-04-29
+        - added Travis & Coveralls
+        - updated Makefile.PL with repo/bug trackers
+
+0.02    2016-04-29
+        - solidify API
+        - write tests
+        - prep for release
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

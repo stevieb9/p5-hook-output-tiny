@@ -14,6 +14,19 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            bugtracker => {
+                web => 'https://github.com/stevieb9/p5-hook-output-tiny/issues',
+            },
+            repository => {
+                type => 'git',
+                url => 'https://github.com/stevieb9/p5-hook-output-tiny.git',
+                web => 'https://github.com/stevieb9/p5-hook-output-tiny',
+            },
+        },
+    },
     BUILD_REQUIRES => {
         'Test::More' => 0,
     },
