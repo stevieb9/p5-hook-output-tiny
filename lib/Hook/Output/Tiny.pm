@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     return bless {
@@ -108,33 +108,33 @@ Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 
     use Hook::Output::Tiny;
 
-    my $h = Hook::Output::Tiny->new;
+    my $output = Hook::Output::Tiny->new;
 
     # trap either
 
-    $h->hook('stdout');
-    my @out = $h->stdout;
+    $output->hook('stdout');
+    my @out = $output->stdout;
 
-    $h->hook('stderr');
-    my @err = $h->stderr;
+    $output->hook('stderr');
+    my @err = $output->stderr;
 
     # untrap either
 
-    $h->unhook('stdout');
-    $h->unhook('stderr');
+    $output->unhook('stdout');
+    $output->unhook('stderr');
 
     # trap/untrap both simultaneously
 
-    $h->hook;
-    $h->unhook;
+    $output->hook;
+    $output->unhook;
 
     # delete all entries from both (can specify individually)
 
-    $h->flush;
+    $output->flush;
 
     # append to a file (can specify individually)
 
-    $h->write('file.txt');
+    $output->write('file.txt');
 
 =head1 DESCRIPTION
 
