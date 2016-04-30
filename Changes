@@ -3,6 +3,7 @@ Revision history for Hook-Output-Tiny
 0.05    xxx
         - replaced $h with $output in SYNOPSIS for hopefully a better
           description (closes #1)
+        - DESC update in POD (closes #20
 
 0.04    2016-04-29
         - ugh, SYNOPSIS fix
