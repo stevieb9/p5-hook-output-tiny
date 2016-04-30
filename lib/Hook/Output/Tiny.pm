@@ -198,16 +198,18 @@ Testing scenario...
     $output->hook;
 
     my $thing = Foo::Bar->new;
+    $thing->do();
 
     $output->unhook;
 
     is ($thing->do(), 1, "thing() ok");
-    is ($output->stdout, 1, "got expected STDOUT");
+    is ($output->stdout, 2, "got expected STDOUT");
     is ($output->stderr, 0, "got no STDERR");
 
-    for ($output->stdout){
-        like ($_, 'Foo::Bar object initialized', "STDOUT ok");
-    }
+    my @stdout = $output->stdout;
+
+    like ($stdout[0], qr/Foo::Bar object initialized/, "STDOUT ok");
+    is ($stdout[1], 'did', "STDOUT said do() 'did'");
 
 =head1 AUTHOR
 
