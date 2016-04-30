@@ -1,5 +1,9 @@
 Revision history for Hook-Output-Tiny
 
+0.04    2016-04-29
+        - ugh, SYNOPSIS fix
+        - Test::BrewBuild happy across random perls on MSWin, Ubuntu, FBSD
+
 0.03    2016-04-29
         - added Travis & Coveralls
         - updated Makefile.PL with repo/bug trackers
