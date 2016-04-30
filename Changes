@@ -5,6 +5,7 @@ Revision history for Hook-Output-Tiny
           description (closes #1)
         - DESC update in POD (closes #2)
         - EXAMPLE fixed in POD (closes #3)
+        - code cleanup, down to 76 lines (including blanks) (closes #5 & #6)
 
 0.04    2016-04-29
         - ugh, SYNOPSIS fix

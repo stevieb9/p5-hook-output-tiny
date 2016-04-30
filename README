@@ -94,10 +94,10 @@ EXAMPLE
         use Test::More;
     
         my $output = Hook::Output::Tiny->new;
+        my $thing = Foo::Bar->new;
     
         $output->hook;
     
-        my $thing = Foo::Bar->new;
         $thing->do();
     
         $output->unhook;
@@ -108,8 +108,18 @@ EXAMPLE
     
         my @stdout = $output->stdout;
     
-        like ($stdout[0], qr/Foo::Bar object initialized/, "STDOUT ok");
+        like ($stdout[0], qr/do() called/, "STDOUT ok");
         is ($stdout[1], 'did', "STDOUT said do() 'did'");
+    
+        $output->hook;
+    
+        $thing->die();
+    
+        $output->unhook;
+    
+        @stderr = $output->stderr;
+    
+        like ($stderr[0], qr/died/, "die() died properly");
 
 AUTHOR
 

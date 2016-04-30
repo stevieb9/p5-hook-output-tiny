@@ -5,22 +5,20 @@ use warnings;
 our $VERSION = '0.05';
 
 sub new {
-    return bless {
-        stdout => {_struct()},
-        stderr => {_struct()},
-    }, shift;
+    my %struct = map { $_ => {_struct()} } qw(stderr stdout);
+    return bless \%struct, shift;
 }
 sub hook {
     my ($self, $handle) = @_;
 
-    my @handles = _handles($handle);
-
-    if (grep {$_ eq 'stderr'} @handles){
-        $self->_stderr;
-    }
-    if (grep {$_ eq 'stdout'} @handles){
-        $self->_stdout;
-        select $self->{stdout}{handle};
+    for(_handles($handle)) {
+        if ($_ eq 'stderr') {
+            $self->_stderr;
+        }
+        else {
+            $self->_stdout;
+            select $self->{stdout}{handle};
+        }
     }
 }
 sub unhook {
@@ -30,21 +28,17 @@ sub unhook {
 
     if (grep {$_ eq 'stdout'} @handles) {
         select STDOUT or die $!;
-        $self->{stdout}{state} = 0;
     }
     if (grep {$_ eq 'stderr'} @handles) {
-        $self->{stderr}{state} = 0;
         close STDERR;
         open STDERR, ">&$self->{stderr}{handle}" or die $!;
     }
 }
 sub stdout {
-    my $self = shift;
-    return split /\n/, $self->{stdout}{data};
+    return split /\n/, $_[0]->{stdout}{data};
 }
 sub stderr {
-    my $self = shift;
-    return split /\n/, $self->{stderr}{data};
+    return split /\n/, $_[0]->{stderr}{data};
 }
 sub flush {
     my ($self, $handle) = @_;
@@ -67,20 +61,18 @@ sub _stdout {
     my $self = shift;
     open $self->{stdout}{handle}, '>>', \$self->{stdout}{data}
       or die "can't hook STDOUT: $!";
-    $self->{stdout}{state} = 1;
 }
 sub _stderr {
     my $self = shift;
-    open $self->{stderr}{handle}, ">&STDERR"
-      or die "can't hook STDERR: $!";
+    open $self->{stderr}{handle}, ">&STDERR" or die "can't hook STDERR: $!";
     close STDERR;
     open STDERR, '>>', \$self->{stderr}{data} or die $!;
 }
 sub _struct {
-     return (state => 0, handle => *fh, data => '');
+     return (handle => *fh, data => '');
 }
 sub _handles {
-    return $_[0] ? ($_[0]) : qw(stdout stderr);
+    return $_[0] ? ($_[0]) : qw(stderr stdout);
 }
 1;
 
@@ -182,10 +174,10 @@ Testing scenario...
     use Test::More;
 
     my $output = Hook::Output::Tiny->new;
+    my $thing = Foo::Bar->new;
 
     $output->hook;
 
-    my $thing = Foo::Bar->new;
     $thing->do();
 
     $output->unhook;
@@ -196,8 +188,18 @@ Testing scenario...
 
     my @stdout = $output->stdout;
 
-    like ($stdout[0], qr/Foo::Bar object initialized/, "STDOUT ok");
+    like ($stdout[0], qr/do() called/, "STDOUT ok");
     is ($stdout[1], 'did', "STDOUT said do() 'did'");
+
+    $output->hook;
+
+    $thing->die();
+
+    $output->unhook;
+
+    @stderr = $output->stderr;
+
+    like ($stderr[0], qr/died/, "die() died properly");
 
 =head1 AUTHOR
 
