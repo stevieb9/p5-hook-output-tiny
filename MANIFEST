@@ -8,6 +8,9 @@ t/00-load.t
 t/01-stdout.t
 t/02-stderr.t
 t/03-both.t
+t/04-flush.t
+t/05-write.t
+t/06-unhook.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

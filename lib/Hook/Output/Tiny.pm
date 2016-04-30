@@ -8,19 +8,10 @@ our $VERSION = '0.01';
 
 sub new {
     return bless {
-        stdout => {
-            state => 0,
-            handle => *fh,
-            data => '',
-        },
-        stderr => {
-            state => 0,
-            handle => *fh,
-            data => '',
-        },
+        stdout => {_struct()},
+        stderr => {_struct()},
     }, shift;
 }
-
 sub hook {
     my ($self, $handle) = @_;
 
@@ -39,14 +30,14 @@ sub unhook {
 
     my @handles = $self->_handles($handle);
 
-    if (grep {$_ eq 'stderr'} @handles){
-        close STDERR;
-        open STDERR, ">&$self->{stderr}{handle}" or die $!;
-        $self->{stderr}{state} = 0;
-    }
-    if (grep {$_ eq 'stdout'} @handles){
+    if (grep {$_ eq 'stdout'} @handles) {
         select STDOUT or die $!;
         $self->{stdout}{state} = 0;
+    }
+    if (grep {$_ eq 'stderr'} @handles) {
+        $self->{stderr}{state} = 0;
+        close STDERR;
+        open STDERR, ">&$self->{stderr}{handle}" or die $!;
     }
 }
 sub stdout {
@@ -69,16 +60,14 @@ sub flush {
 sub write {
     my ($self, $fn, $handle) = @_;
 
-    open my $wfh, '>>', $fn or die $!;
-
     my @handles = $self->_handles($handle);
 
-    for (@handles) {
-        print $wfh $_ for @{ $self->{$_}{data} };
+    for (@handles){
+        open my $wfh, '>>', $fn or die $!;
+        print $wfh $self->{$_}{data};
+        close $wfh;
         $self->flush($_);
     }
-
-    close $wfh;
 }
 sub _stdout {
     my $self = shift;
@@ -91,6 +80,13 @@ sub _stderr {
     open $self->{stderr}{handle}, ">&STDERR" or die $!;
     close STDERR;
     open STDERR, '>>', \$self->{stderr}{data} or die $!;
+}
+sub _struct {
+     return (
+        state => 0,
+        handle => *fh,
+        data => '',
+    );
 }
 sub _handles {
     my ($self, $handle) = @_;
@@ -133,13 +129,21 @@ $h->unhook('stderr');
 $h->hook;
 $h->unhook;
 
+# delete all entries from both (can specify individually)
+
+$h->flush;
+
+# append to a file (can specify individually)
+
+$h->write('file.txt');
+
 =head1 DESCRIPTION
 
 Extremely lightweight mechanism for capturing C<STDOUT>, C<STDERR> or both.
 
 We save the captured output internally for the entire process run, so on long
 running applications, memory usage may become an issue if you don't flush out
-the data.
+or write out the data.
 
 There are many modules that perform this task. I wrote this one for fun, and to
 be as small as possible.
@@ -153,8 +157,8 @@ Returns a new L<Hook::Output::Tiny> instance.
 =head2 hook
 
 You can send in either C<'stdout'> or C<'stderr'> and we'll capture that data.
-If you don't specify an option, we'll capture both (and keep the data separate
-internally).
+If you don't specify an option, we'll capture both (internally, we keep the data
+separate for both handles).
 
 =head2 unhook
 
