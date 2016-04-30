@@ -1,6 +1,4 @@
 package Hook::Output::Tiny;
-
-use 5.006;
 use strict;
 use warnings;
 
@@ -15,7 +13,7 @@ sub new {
 sub hook {
     my ($self, $handle) = @_;
 
-    my @handles = $self->_handles($handle);
+    my @handles = _handles($handle);
 
     if (grep {$_ eq 'stderr'} @handles){
         $self->_stderr;
@@ -28,7 +26,7 @@ sub hook {
 sub unhook {
     my ($self, $handle) = @_;
 
-    my @handles = $self->_handles($handle);
+    my @handles = _handles($handle);
 
     if (grep {$_ eq 'stdout'} @handles) {
         select STDOUT or die $!;
@@ -50,14 +48,14 @@ sub stderr {
 }
 sub flush {
     my ($self, $handle) = @_;
-    my @handles = $self->_handles($handle);
+    my @handles = _handles($handle);
     for (@handles){
         delete $self->{$_}{data};
     }
 }
 sub write {
     my ($self, $fn, $handle) = @_;
-    my @handles = $self->_handles($handle);
+    my @handles = _handles($handle);
     for (@handles){
         open my $wfh, '>>', $fn or die $!;
         print $wfh $self->{$_}{data};
@@ -79,23 +77,13 @@ sub _stderr {
     open STDERR, '>>', \$self->{stderr}{data} or die $!;
 }
 sub _struct {
-     return (
-        state => 0,
-        handle => *fh,
-        data => '',
-    );
+     return (state => 0, handle => *fh, data => '');
 }
 sub _handles {
-    my ($self, $handle) = @_;
-    my @handles;
-    if ($handle){
-        push @handles, $handle;
-    }
-    else {
-        push @handles, 'stdout', 'stderr';
-    }
-    return @handles;
+    return $_[0] ? ($_[0]) : qw(stdout stderr);
 }
+1;
+
 =head1 NAME
 
 Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
@@ -141,7 +129,7 @@ Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 Extremely lightweight mechanism for trapping C<STDOUT>, C<STDERR> or both.
 
 We save the captured output internally, so on long running applications, memory
-usage may become an issue if you don't C<flush()> out or C<write() out the data.
+usage may become an issue if you don't C<flush()> out or C<write()> out the data.
 
 There are many modules that perform this task. I wrote this one for fun, and to
 be as small and as simple as possible.
