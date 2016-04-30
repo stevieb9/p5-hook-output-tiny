@@ -178,7 +178,7 @@ Testing scenario...
 
     $output->hook;
 
-    $thing->do();
+    $thing->do;
 
     $output->unhook;
 
@@ -193,13 +193,13 @@ Testing scenario...
 
     $output->hook;
 
-    $thing->die();
+    $thing->error;
 
     $output->unhook;
 
     @stderr = $output->stderr;
 
-    like ($stderr[0], qr/died/, "die() died properly");
+    like ($stderr[0], qr/error/, "error() errored properly");
 
 =head1 AUTHOR
 
