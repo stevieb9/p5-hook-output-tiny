@@ -216,6 +216,16 @@ Testing scenario...
 
     like ($stderr[0], qr/error/, "error() errored properly");
 
+=head1 SEE ALSO
+
+L<Capture::Tiny>, the de-facto in-core standard.
+
+L<IO::CaptureOutput>
+
+L<IO::Capture::Output>
+
+L<Hook::Output::File>
+
 =head1 AUTHOR
 
 Steve Bertrand, C<< <steveb at cpan.org> >>

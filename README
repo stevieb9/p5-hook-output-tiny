@@ -98,7 +98,7 @@ EXAMPLE
     
         $output->hook;
     
-        $thing->do();
+        $thing->do;
     
         $output->unhook;
     
@@ -113,13 +113,23 @@ EXAMPLE
     
         $output->hook;
     
-        $thing->die();
+        $thing->error;
     
         $output->unhook;
     
         @stderr = $output->stderr;
     
-        like ($stderr[0], qr/died/, "die() died properly");
+        like ($stderr[0], qr/error/, "error() errored properly");
+
+SEE ALSO
+
+    Capture::Tiny, the de-facto in-core standard.
+
+    IO::CaptureOutput
+
+    IO::Capture::Output
+
+    Hook::Output::File
 
 AUTHOR
 
