@@ -24,6 +24,7 @@ pm_to_blib$
 ^\w+.pl$
 .ignore.txt$
 .travis.yml$
+appveyor.yml$
 .iml$
 examples/
 build/

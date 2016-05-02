@@ -49,6 +49,10 @@ sub flush {
 }
 sub write {
     my ($self, $fn, $handle) = @_;
+    if ($fn eq 'stderr' || $fn eq 'stdout'){
+        die "write() requires a file name sent in before the handle\n";
+    }
+
     my @handles = _handles($handle);
     for (@handles){
         open my $wfh, '>>', $fn or die $!;
@@ -72,7 +76,18 @@ sub _struct {
      return (handle => *fh, data => '');
 }
 sub _handles {
-    return $_[0] ? ($_[0]) : qw(stderr stdout);
+    my $handle = shift;
+    my $sub = (caller(1))[3];
+    _check_param($sub, $handle) if $handle;
+    return $handle ? ($handle) : qw(stderr stdout);
+}
+sub _check_param {
+    # validates the $handle param
+    my ($sub, $handle) = @_;
+    if (! grep {$handle eq $_} qw(stderr stdout)){
+        die "$sub() either takes 'stderr', 'stdout' or no params\n" .
+            "You supplied '$handle'\n";
+    }
 }
 1;
 
