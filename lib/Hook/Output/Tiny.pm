@@ -17,7 +17,6 @@ sub hook {
         }
         else {
             $self->_stdout;
-            select $self->{stdout}{handle};
         }
     }
 }
@@ -27,7 +26,8 @@ sub unhook {
     my @handles = _handles($handle);
 
     if (grep {$_ eq 'stdout'} @handles) {
-        select STDOUT or die $!;
+        close STDOUT;
+        open STDOUT, ">&$self->{stdout}{handle}" or die $!;
     }
     if (grep {$_ eq 'stderr'} @handles) {
         close STDERR;
@@ -63,8 +63,9 @@ sub write {
 }
 sub _stdout {
     my $self = shift;
-    open $self->{stdout}{handle}, '>>', \$self->{stdout}{data}
-      or die "can't hook STDOUT: $!";
+    open $self->{stdout}{handle}, ">&STDOUT" or die "can't hook STDOUT: $!";
+    close STDOUT;
+    open STDOUT, '>>', \$self->{stdout}{data} or die $!;
 }
 sub _stderr {
     my $self = shift;
