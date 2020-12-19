@@ -110,9 +110,11 @@ Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
     # trap either
 
     $output->hook('stdout');
+    ...
     my @out = $output->stdout;
 
     $output->hook('stderr');
+    ...
     my @err = $output->stderr;
 
     # untrap either
@@ -123,6 +125,10 @@ Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
     # trap/untrap both simultaneously
 
     $output->hook;
+
+    print "blah!\n"; # STDOUT
+    warn  "blah!\n"; # STDERR
+
     $output->unhook;
 
     # delete all entries from both (can specify individually)
