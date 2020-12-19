@@ -146,8 +146,8 @@ Extremely lightweight mechanism for trapping C<STDOUT>, C<STDERR> or both.
 We save the captured output internally, so on long running applications, memory
 usage may become an issue if you don't C<flush()> out or C<write()> out the data.
 
-There are many modules that perform this task. I wrote this one for fun, and to
-be as small and as simple as possible.
+There are many modules that perform this task. I wrote this one as a learning
+exercise, and to make it as small and as simple as possible.
 
 =head1 METHODS
 
