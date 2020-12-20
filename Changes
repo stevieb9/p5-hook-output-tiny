@@ -3,6 +3,9 @@ Revision history for Hook-Output-Tiny
 0.06 UNREL
         - Rephrase POD to reflect this dist was written as a learning exercise
           (closes #12)
+        - We now return an empty array from stdout() and stderr() if the data
+          has been flushed (fixes #10)
+        - We now warn if stdout() or stderr() are called in non-list context
 
 0.05    2016-04-30
         - replaced $h with $output in SYNOPSIS for hopefully a better
