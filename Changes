@@ -5,7 +5,8 @@ Revision history for Hook-Output-Tiny
           (closes #12)
         - We now return an empty array from stdout() and stderr() if the data
           has been flushed (fixes #10)
-        - We now warn if stdout() or stderr() are called in non-list context
+        - We now warn if stdout() or stderr() are called in non-list context,
+          and that calling in scalar context is deprecated and will be removed
 
 0.05    2016-04-30
         - replaced $h with $output in SYNOPSIS for hopefully a better

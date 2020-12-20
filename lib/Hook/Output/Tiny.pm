@@ -35,12 +35,12 @@ sub unhook {
     }
 }
 sub stdout {
-    warn "Calling stdout() in non-list context will be deprecated!\n" if ! wantarray;
+    warn "Calling stdout() in non-list context is deprecated!\n" if ! wantarray;
     return @{[()]} if ! defined $_[0]->{stdout}{data};
     return split /\n/, $_[0]->{stdout}{data};
 }
 sub stderr {
-    warn "Calling stderr() in non-list context will be deprecated!\n" if ! wantarray;
+    warn "Calling stderr() in non-list context is deprecated!\n" if ! wantarray;
     return @{[()]} if ! defined $_[0]->{stderr}{data};
     return split /\n/, $_[0]->{stderr}{data};
 }
