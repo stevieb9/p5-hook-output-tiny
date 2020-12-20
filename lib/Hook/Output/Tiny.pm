@@ -4,6 +4,8 @@ use warnings;
 
 our $VERSION = '0.07';
 
+use Carp qw(croak);
+
 BEGIN {
     # Auto generate the stdout() and stderr() methods, and their private
     # helper counterparts
@@ -34,9 +36,10 @@ BEGIN {
             my ($self) = @_;
 
             my $HANDLE = uc $sub_name;
-            open $self->{$sub_name}{handle}, ">&$HANDLE" or die "can't hook $HANDLE: $!";
+            open $self->{$sub_name}{handle}, ">&$HANDLE"
+              or croak("can't hook " . uc $sub_name . ": $!");
             close $HANDLE;
-            open $HANDLE, '>>', \$self->{$sub_name}{data} or die $!;
+            open $HANDLE, '>>', \$self->{$sub_name}{data} or croak($!);
         };
     }
 }
@@ -55,7 +58,7 @@ sub unhook {
     for (_handles($handle)) {
         no strict 'refs'; # To allow a string as STDOUT/STDERR bareword handles
         close uc $_;
-        open uc $_, ">&$self->{$_}{handle}" or die $!;
+        open uc $_, ">&$self->{$_}{handle}" or croak($!);
     }
 }
 sub flush {
@@ -65,11 +68,11 @@ sub flush {
 sub write {
     my ($self, $fn, $handle) = @_;
     if ($fn eq 'stderr' || $fn eq 'stdout'){
-        die "write() requires a file name sent in before the handle\n";
+        croak("write() requires a file name sent in before the handle\n");
     }
 
     for (_handles($handle)){
-        open my $wfh, '>>', $fn or die $!;
+        open my $wfh, '>>', $fn or croak($!);
         print $wfh $self->{$_}{data};
         close $wfh;
         $self->flush($_);
@@ -88,8 +91,10 @@ sub _check_param {
     # validates the $handle param
     my ($sub, $handle) = @_;
     if (! grep {$handle eq $_} qw(stderr stdout)){
-        die "$sub() either takes 'stderr', 'stdout' or no params\n" .
-            "You supplied '$handle'\n";
+        croak(
+            "$sub() either takes 'stderr', 'stdout' or no params\n" .
+            "You supplied '$handle'\n"
+        );
     }
 }
 

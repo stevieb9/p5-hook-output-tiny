@@ -6,6 +6,7 @@ Revision history for Hook-Output-Tiny
         - _stdout() _stderr() private methods are also now dynamically auto
           generated
         - Code refactoring to reduce number of lines
+        - Changed from die() to Carp::croak()
 
 0.06    2020-12-19
         - Rephrase POD to reflect this dist was written as a learning exercise
