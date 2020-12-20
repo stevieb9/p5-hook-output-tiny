@@ -1,5 +1,8 @@
 Revision history for Hook-Output-Tiny
 
+1.00 UNREL
+        -
+
 0.06    2020-12-19
         - Rephrase POD to reflect this dist was written as a learning exercise
           (closes #12)

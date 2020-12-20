@@ -2,7 +2,7 @@ package Hook::Output::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my %struct = map { $_ => {_struct()} } qw(stderr stdout);
