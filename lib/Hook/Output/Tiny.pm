@@ -174,9 +174,15 @@ both.
 
 Returns a list of all the C<STDOUT> entries that have been trapped.
 
+Calling this method in non-list context now throws a warning, and will be
+deprecated and that ability removed in a future release.
+
 =head2 stderr
 
 Returns a list of all the C<STDERR> entries that have been trapped.
+
+Calling this method in non-list context now throws a warning, and will be
+deprecated and that ability removed in a future release.
 
 =head2 write($filename, $handle)
 
