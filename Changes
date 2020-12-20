@@ -1,7 +1,11 @@
 Revision history for Hook-Output-Tiny
 
 1.00 UNREL
-        -
+        - Completely redesigned stdout() and stderr(). We now auto-generate
+          them dynamically within a BEGIN block
+        - _stdout() _stderr() private methods are also now dynamically auto
+          generated
+        - Code refactoring to reduce number of lines
 
 0.06    2020-12-19
         - Rephrase POD to reflect this dist was written as a learning exercise

@@ -4,52 +4,63 @@ use warnings;
 
 our $VERSION = '0.07';
 
+BEGIN {
+    # Auto generate the stdout() and stderr() methods, and their private
+    # helper counterparts
+
+    no strict 'refs';
+
+    for ('stdout', 'stderr') {
+        my $sub_name = $_; # We need to make a copy
+
+        # Public
+
+        *$_ = sub {
+            my ($self) = @_;
+
+            if (!wantarray) {
+                warn "Calling $sub_name() in non-list context is deprecated!\n";
+            }
+            return defined $self->{$sub_name}{data}
+                ? split /\n/, $self->{$sub_name}{data}
+                : @{[ () ]}; # Empty list
+        };
+
+        # Private
+
+        my $private_sub_name = "_$sub_name";
+
+        *$private_sub_name = sub {
+            my ($self) = @_;
+
+            my $HANDLE = uc $sub_name;
+            open $self->{$sub_name}{handle}, ">&$HANDLE" or die "can't hook $HANDLE: $!";
+            close $HANDLE;
+            open $HANDLE, '>>', \$self->{$sub_name}{data} or die $!;
+        };
+    }
+}
+
 sub new {
     my %struct = map { $_ => {_struct()} } qw(stderr stdout);
-    return bless \%struct, shift;
+    return bless \%struct, $_[0];
 }
 sub hook {
     my ($self, $handle) = @_;
-
-    for(_handles($handle)) {
-        if ($_ eq 'stderr') {
-            $self->_stderr;
-        }
-        else {
-            $self->_stdout;
-        }
-    }
+    $_ eq 'stderr' ? $self->_stderr : $self->_stdout for _handles($handle);
 }
 sub unhook {
     my ($self, $handle) = @_;
 
-    my @handles = _handles($handle);
-
-    if (grep {$_ eq 'stdout'} @handles) {
-        close STDOUT;
-        open STDOUT, ">&$self->{stdout}{handle}" or die $!;
+    for (_handles($handle)) {
+        no strict 'refs'; # To allow a string as STDOUT/STDERR bareword handles
+        close uc $_;
+        open uc $_, ">&$self->{$_}{handle}" or die $!;
     }
-    if (grep {$_ eq 'stderr'} @handles) {
-        close STDERR;
-        open STDERR, ">&$self->{stderr}{handle}" or die $!;
-    }
-}
-sub stdout {
-    warn "Calling stdout() in non-list context is deprecated!\n" if ! wantarray;
-    return @{[()]} if ! defined $_[0]->{stdout}{data};
-    return split /\n/, $_[0]->{stdout}{data};
-}
-sub stderr {
-    warn "Calling stderr() in non-list context is deprecated!\n" if ! wantarray;
-    return @{[()]} if ! defined $_[0]->{stderr}{data};
-    return split /\n/, $_[0]->{stderr}{data};
 }
 sub flush {
     my ($self, $handle) = @_;
-    my @handles = _handles($handle);
-    for (@handles){
-        delete $self->{$_}{data};
-    }
+    delete $self->{$_}{data} for _handles($handle);
 }
 sub write {
     my ($self, $fn, $handle) = @_;
@@ -57,31 +68,18 @@ sub write {
         die "write() requires a file name sent in before the handle\n";
     }
 
-    my @handles = _handles($handle);
-    for (@handles){
+    for (_handles($handle)){
         open my $wfh, '>>', $fn or die $!;
         print $wfh $self->{$_}{data};
         close $wfh;
         $self->flush($_);
     }
 }
-sub _stdout {
-    my $self = shift;
-    open $self->{stdout}{handle}, ">&STDOUT" or die "can't hook STDOUT: $!";
-    close STDOUT;
-    open STDOUT, '>>', \$self->{stdout}{data} or die $!;
-}
-sub _stderr {
-    my $self = shift;
-    open $self->{stderr}{handle}, ">&STDERR" or die "can't hook STDERR: $!";
-    close STDERR;
-    open STDERR, '>>', \$self->{stderr}{data} or die $!;
-}
 sub _struct {
      return (handle => *fh, data => '');
 }
 sub _handles {
-    my $handle = shift;
+    my ($handle) = @_;
     my $sub = (caller(1))[3];
     _check_param($sub, $handle) if $handle;
     return $handle ? ($handle) : qw(stderr stdout);
@@ -94,7 +92,9 @@ sub _check_param {
             "You supplied '$handle'\n";
     }
 }
+
 1;
+__END__
 
 =head1 NAME
 
