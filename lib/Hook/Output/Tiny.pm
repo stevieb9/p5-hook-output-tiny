@@ -2,7 +2,7 @@ package Hook::Output::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub new {
     my %struct = map { $_ => {_struct()} } qw(stderr stdout);
@@ -109,39 +109,39 @@ Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 
     use Hook::Output::Tiny;
 
-    my $output = Hook::Output::Tiny->new;
+    my $trap = Hook::Output::Tiny->new;
 
     # trap either
 
-    $output->hook('stdout');
+    $trap->hook('stdout');
     ...
-    my @out = $output->stdout;
+    my @out = $trap->stdout;
 
-    $output->hook('stderr');
+    $trap->hook('stderr');
     ...
-    my @err = $output->stderr;
+    my @err = $trap->stderr;
 
     # untrap either
 
-    $output->unhook('stdout');
-    $output->unhook('stderr');
+    $trap->unhook('stdout');
+    $trap->unhook('stderr');
 
     # trap/untrap both simultaneously
 
-    $output->hook;
+    $trap->hook;
 
     print "blah!\n"; # STDOUT
     warn  "blah!\n"; # STDERR
 
-    $output->unhook;
+    $trap->unhook;
 
     # delete all entries from both (can specify individually)
 
-    $output->flush;
+    $trap->flush;
 
     # append to a file (can specify individually)
 
-    $output->write('file.txt');
+    $trap->write('file.txt');
 
 =head1 DESCRIPTION
 
