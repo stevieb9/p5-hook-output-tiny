@@ -20,7 +20,7 @@ BEGIN {
         *$_ = sub {
             my ($self) = @_;
 
-            if (!wantarray) {
+            if (! wantarray) {
                 warn "Calling $sub_name() in non-list context is deprecated!\n";
             }
             return defined $self->{$sub_name}{data}
@@ -43,7 +43,6 @@ BEGIN {
         };
     }
 }
-
 sub new {
     my %struct = map { $_ => {_struct()} } qw(stderr stdout);
     return bless \%struct, $_[0];
@@ -60,6 +59,46 @@ sub unhook {
         close uc $_;
         open uc $_, '>&', $self->{$_}{handle} or croak($!);
     }
+}
+sub include {
+    my ($self, $include) = @_;
+
+    if (defined $include) {
+        if (ref $include ne 'ARRAY') {
+            croak("include() requires an array of regex objects sent in");
+        }
+        if (! defined $include->[0]) {
+            croak("include() requires at least one regex object within the array reference");
+        }
+        for (@$include) {
+            if (ref $_ ne 'REGEX') {
+                croak("include()'s array reference must only contain regex objects");
+            }
+        }
+        $self->{include} = $include;
+    }
+
+    return $self->{include} // [];
+}
+sub exclude {
+    my ($self, $exclude) = @_;
+
+    if (defined $exclude) {
+        if (ref $exclude ne 'ARRAY') {
+            croak("exclude() requires an array of regex objects sent in");
+        }
+        if (! defined $exclude->[0]) {
+            croak("exclude() requires at least one regex object within the array reference");
+        }
+        for (@$exclude) {
+            if (ref $_ ne 'REGEX') {
+                croak("exclude()'s array reference must only contain regex objects");
+            }
+        }
+        $self->{exclude} = $exclude;
+    }
+
+    return $self->{exclude} // [];
 }
 sub flush {
     my ($self, $handle) = @_;
