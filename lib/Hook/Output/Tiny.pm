@@ -36,7 +36,7 @@ BEGIN {
             my ($self) = @_;
 
             my $HANDLE = uc $sub_name;
-            open $self->{$sub_name}{handle}, ">&$HANDLE"
+            open $self->{$sub_name}{handle}, '>&', $HANDLE
               or croak("can't hook " . uc $sub_name . ": $!");
             close $HANDLE;
             open $HANDLE, '>>', \$self->{$sub_name}{data} or croak($!);
@@ -58,7 +58,7 @@ sub unhook {
     for (_handles($handle)) {
         no strict 'refs'; # To allow a string as STDOUT/STDERR bareword handles
         close uc $_;
-        open uc $_, ">&$self->{$_}{handle}" or croak($!);
+        open uc $_, '>&', $self->{$_}{handle} or croak($!);
     }
 }
 sub flush {
