@@ -145,9 +145,9 @@ __END__
 Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 
 =for html
-<a href="http://travis-ci.org/stevieb9/p5-hook-output-tiny"><img src="https://secure.travis-ci.org/stevieb9/p5-hook-output-tiny.png"/></a>
+<a href="https://github.com/stevieb/=/actions"><img src="https://github.com/stevieb/=/workflows/CI/badge.svg"/></a>
 <a href="https://ci.appveyor.com/project/stevieb9/p5-hook-output-tiny"><img src="https://ci.appveyor.com/api/projects/status/br01o72b3if3plsw/branch/master?svg=true"/></a>
-<a href='https://coveralls.io/github/stevieb9/p5-hook-output-tiny?branch=master'><img src='https://coveralls.io/repos/stevieb9/p5-hook-output-tiny/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+<a href='https://coveralls.io/github/stevieb/=?branch=master'><img src='https://coveralls.io/repos/stevieb/=/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 SYNOPSIS
 
