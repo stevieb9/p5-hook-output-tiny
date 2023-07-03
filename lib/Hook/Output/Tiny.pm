@@ -60,46 +60,50 @@ sub unhook {
         open uc $_, '>&', $self->{$_}{handle} or croak($!);
     }
 }
-sub include {
-    my ($self, $include) = @_;
 
-    if (defined $include) {
-        if (ref $include ne 'ARRAY') {
-            croak("include() requires an array of regex objects sent in");
-        }
-        if (! defined $include->[0]) {
-            croak("include() requires at least one regex object within the array reference");
-        }
-        for (@$include) {
-            if (ref $_ ne 'REGEX') {
-                croak("include()'s array reference must only contain regex objects");
-            }
-        }
-        $self->{include} = $include;
-    }
+# Commenting out include() and exclude(). They're to be used to filter the
+# output. They have no docs nor tests yet.
 
-    return $self->{include} // [];
-}
-sub exclude {
-    my ($self, $exclude) = @_;
-
-    if (defined $exclude) {
-        if (ref $exclude ne 'ARRAY') {
-            croak("exclude() requires an array of regex objects sent in");
-        }
-        if (! defined $exclude->[0]) {
-            croak("exclude() requires at least one regex object within the array reference");
-        }
-        for (@$exclude) {
-            if (ref $_ ne 'REGEX') {
-                croak("exclude()'s array reference must only contain regex objects");
-            }
-        }
-        $self->{exclude} = $exclude;
-    }
-
-    return $self->{exclude} // [];
-}
+#sub include {
+#    my ($self, $include) = @_;
+#
+#    if (defined $include) {
+#        if (ref $include ne 'ARRAY') {
+#            croak("include() requires an array of regex objects sent in");
+#        }
+#        if (! defined $include->[0]) {
+#            croak("include() requires at least one regex object within the array reference");
+#        }
+#        for (@$include) {
+#            if (ref $_ ne 'REGEX') {
+#                croak("include()'s array reference must only contain regex objects");
+#            }
+#        }
+#        $self->{include} = $include;
+#    }
+#
+#    return $self->{include} // [];
+#}
+#sub exclude {
+#    my ($self, $exclude) = @_;
+#
+#    if (defined $exclude) {
+#        if (ref $exclude ne 'ARRAY') {
+#            croak("exclude() requires an array of regex objects sent in");
+#        }
+#        if (! defined $exclude->[0]) {
+#            croak("exclude() requires at least one regex object within the array reference");
+#        }
+#        for (@$exclude) {
+#            if (ref $_ ne 'REGEX') {
+#                croak("exclude()'s array reference must only contain regex objects");
+#            }
+#        }
+#        $self->{exclude} = $exclude;
+#    }
+#
+#    return $self->{exclude} // [];
+#}
 sub flush {
     my ($self, $handle) = @_;
     delete $self->{$_}{data} for _handles($handle);
@@ -300,7 +304,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2023 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
