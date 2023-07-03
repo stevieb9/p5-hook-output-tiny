@@ -1,5 +1,8 @@
 Revision history for Hook-Output-Tiny
 
+1.02 UNREL
+    -
+
 1.01    2023-07-03
         - Deleted AppVeyor test config
         - Reworked CI configuration
