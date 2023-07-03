@@ -1,7 +1,8 @@
 Revision history for Hook-Output-Tiny
 
 1.01 UNREL
-        -
+        - Deleted AppVeyor test config
+        - Reworked CI configuration
 
 1.00    2020-12-20
         - Completely redesigned stdout() and stderr(). We now auto-generate
